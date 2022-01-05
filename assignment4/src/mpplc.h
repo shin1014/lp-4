@@ -58,4 +58,6 @@ void POP(char *a);
 void CALL(char *a, char *x);
 void RET(void);
 
+void SVC(char *a, char *x);
+void NOP(void);
 
