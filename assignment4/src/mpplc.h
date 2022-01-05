@@ -15,3 +15,7 @@ void MULA(char *a, char *b);
 void MULL(char *a, char *b);
 void DIVA(char *a, char *b);
 void DIVL(char *a, char *b);
+
+void AND(char *a, char *b);
+void OR(char *a, char *b);
+void XOR(char *a, char *b);

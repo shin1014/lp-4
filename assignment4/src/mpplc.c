@@ -25,4 +25,9 @@ void SUBL(char *a, char *b){fprintf(outfp,"\tSUBL\t%s, %s\n",a,b);}
 void MULA(char *a, char *b){fprintf(outfp,"\tMULA\t%s, %s\n",a,b);}
 void MULL(char *a, char *b){fprintf(outfp,"\tMULL\t%s, %s\n",a,b);}
 void DIVA(char *a, char *b){fprintf(outfp,"\tDIVA\t%s, %s\n",a,b);}
-void DIVL(char *a, char *b){fprintf(outfp,"\tDIVA\t%s, %s\n",a,b);}
+void DIVL(char *a, char *b){fprintf(outfp,"\tDIVL\t%s, %s\n",a,b);}
+
+void AND(char *a, char *b){fprintf(outfp,"\tAND\t%s, %s\n",a,b);}
+void OR(char *a, char *b){fprintf(outfp,"\tOR\t%s, %s\n",a,b);}
+void XOR(char *a, char *b){fprintf(outfp,"\tXOR\t%s, %s\n",a,b);}
+
