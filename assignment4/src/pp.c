@@ -218,6 +218,13 @@ int variable_name(void){
 	}else{	/* not first variable */
 		temp = id_record(string_attr);
 	}
+
+	char *label;
+	if(IN_FP || IN_VAR){
+		label = (char *)malloc(sizeof(char) * MAXSTRSIZE);
+		snprintf(label,MAXSTRSIZE,"$%s",string_attr);
+		DC(label, 0);
+	}
 	token = scan_pp();
 	if(temp->itp!=NULL){
 		Type = temp->itp->ttype;

@@ -73,8 +73,8 @@ void NOP(void);
 
 void START(char* program_name);
 void END(void);
-void DS(int num);
-void DC(int num);
+void DS(char *label, int num);
+void DC(char *label, int num);
 void IN(char *a, char *b);
 void OUT(char *a,char *b);
 void RPOP(void);
