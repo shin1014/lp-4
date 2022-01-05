@@ -5,7 +5,7 @@
 #include "token-list.h"
 #include "id-list.h"
 
-#define PP 0
+#define PP 1
 
 #define NORMAL 0
 #define ERROR -1

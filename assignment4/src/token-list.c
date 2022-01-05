@@ -1,5 +1,6 @@
 ﻿#include "token-list.h"
 #include "id-list.h"
+#include "mpplc.h"
 
 /* keyword list */
 struct KEY key[KEYWORDSIZE] = {
@@ -52,6 +53,8 @@ extern char string_attr[MAXSTRSIZE];
 int token;
 int error_(char *mes);
 
+FILE *outfp;
+
 int main(int nc, char *np[]) {
     if(nc < 2) {
 	printf("File name id not given.\n");
@@ -63,9 +66,14 @@ int main(int nc, char *np[]) {
     }
     init_globalid();
     init_localid();
+
+    init_output();
+
     token = scan();
     prase_program();
     printf("\n");
+
+    end_output();
     return 0;
 }
 
