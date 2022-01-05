@@ -44,3 +44,10 @@ void SLA(char *a, char *b, char *x);
 void SRA(char *a, char *b, char *x);
 void SLL(char *a, char *b, char *x);
 void SRL(char *a, char *b, char *x);
+
+void JPL(char *a, char *x);
+void JMI(char *a, char *x);
+void JNZ(char *a, char *x);
+void JZE(char *a, char *x);
+void JOV(char *a, char *x);
+void JUMP(char *a, char *x);

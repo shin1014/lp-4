@@ -56,3 +56,12 @@ void SRA(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSRA\t%s, %s\n",
 void SLL(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSLL\t%s, %s\n",a,b);else fprintf(outfp,"\tSLL\t%s, %s, %s\n",a,b,x);}
 void SRL(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSRL\t%s, %s\n",a,b);else fprintf(outfp,"\tSRL\t%s, %s, %s\n",a,b,x);}
 
+void JPL(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJPL\t%s\n",a);else fprintf(outfp,"\tJPL\t%s, %s\n",a,x);}
+void JMI(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJMI\t%s\n",a);else fprintf(outfp,"\tJMI\t%s, %s\n",a,x);}
+void JNZ(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJNZ\t%s\n",a);else fprintf(outfp,"\tJNZ\t%s, %s\n",a,x);}
+void JZE(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJZE\t%s\n",a);else fprintf(outfp,"\tJZE\t%s, %s\n",a,x);}
+void JOV(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJOV\t%s\n",a);else fprintf(outfp,"\tJOV\t%s, %s\n",a,x);}
+void JUMP(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJUMP\t%s\n",a);else fprintf(outfp,"\tJUMP\t%s, %s\n",a,x);}
+
+
+
