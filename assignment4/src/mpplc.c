@@ -63,5 +63,9 @@ void JZE(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJZE\t%s\n",a);else fprin
 void JOV(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJOV\t%s\n",a);else fprintf(outfp,"\tJOV\t%s, %s\n",a,x);}
 void JUMP(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJUMP\t%s\n",a);else fprintf(outfp,"\tJUMP\t%s, %s\n",a,x);}
 
+void PUSH(char *a, char *x){if(x==NULL) fprintf(outfp,"\tPUSH\t%s\n",a);else fprintf(outfp,"\tPUSH\t%s, %s\n",a,x);}
+void POP(char *a){fprintf(outfp,"\tPUSH\t%s\n",a);}
+
+
 
 

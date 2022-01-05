@@ -51,3 +51,8 @@ void JNZ(char *a, char *x);
 void JZE(char *a, char *x);
 void JOV(char *a, char *x);
 void JUMP(char *a, char *x);
+
+void PUSH(char *a, char *x);
+void POP(char *a);
+
+
