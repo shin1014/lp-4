@@ -4,6 +4,7 @@
 
 #include "token-list.h"
 #include "id-list.h"
+#include "mpplc.h"
 
 #define PP 1
 
@@ -25,7 +26,7 @@ int ARRAYSIZE;
 int scan_pp(void);
 void print_tab(int tab_num);
 
-int prase_program(void);
+int parse_program(void);
 int block(void);
 int variable_declaration(void);
 int variable_names(void);
@@ -138,10 +139,11 @@ void print_tab(int tab_num){
 	fflush(stdout);
 }
 
-int prase_program(void){
+int parse_program(void){
 	if(token != TPROGRAM) return(error_("Keyword 'program' is not found"));
 	token = scan_pp();
 	if(token != TNAME) return(error_("Keyword 'name' is not found"));
+	start_mpl(string_attr);
 	token = scan_pp();
 	if(token != TSEMI) return(error_("';' is not found"));
 	token = scan_pp();

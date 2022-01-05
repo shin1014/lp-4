@@ -70,7 +70,7 @@ int main(int nc, char *np[]) {
     init_output();
 
     token = scan();
-    prase_program();
+    parse_program();
     printf("\n");
 
     end_output();

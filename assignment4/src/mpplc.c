@@ -14,10 +14,18 @@ void end_output(void){
 	fclose(outfp);
 }
 
+void start_mpl(char* program_name){
+	fprintf(outfp, "$$%s\tSTART\n", program_name);
+	LAD(gr0,"0",NULL);
+	CALL("L0001",NULL);
+	CALL("FLUSH",NULL);
+	SVC("0",NULL);
+}
+
 void LD(char *a, char *b){fprintf(outfp,"\tLD\t%s, %s\n",a,b);}
 void LD_ra(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tLD\t%s, %s\n",a,b);else fprintf(outfp,"\tLD\t%s, %s, %s\n",a,b,x);}
 void ST(char *a, char *b){fprintf(outfp,"\tST\t%s, %s\n",a,b);}
-void LAD(char *a, char *b){fprintf(outfp,"\tLAD\t%s, %s\n",a,b);}
+void LAD(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tLAD\t%s, %s\n",a,b);else fprintf(outfp,"\tLAD\t%s, %s, %s\n",a,b,x);}
 
 void ADDA(char *a, char *b){fprintf(outfp,"\tADDA\t%s, %s\n",a,b);}
 void ADDL(char *a, char *b){fprintf(outfp,"\tADDL\t%s, %s\n",a,b);}
@@ -71,3 +79,5 @@ void RET(void){fprintf(outfp,"\tRET\n");}
 
 void SVC(char *a, char *x){if(x==NULL) fprintf(outfp,"\tSVC\t%s\n",a);else fprintf(outfp,"\tSVC\t%s, %s\n",a,x);}
 void NOP(void){fprintf(outfp,"\tNOP\n");}
+
+

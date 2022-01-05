@@ -88,7 +88,7 @@ extern int getcbuf(void);
 
 /* pp.c */
 extern int token;
-extern int prase_program(void);
+extern int parse_program(void);
 /*
 extern int block(void);
 extern int variable_declaration(void);

@@ -1,12 +1,22 @@
+#define gr0 "gr0"
+#define gr1 "gr1"
+#define gr2 "gr2"
+#define gr3 "gr3"
+#define gr4 "gr4"
+#define gr5 "gr5"
+#define gr6 "gr6"
+#define gr7 "gr7"
+
 extern FILE *outfp;
 
 void init_output(void);
 void end_output(void);
+void start_mpl(char* program_name);
 
 void LD(char *a, char *b);
 void LD_ra(char *a, char *b, char *x);
 void ST(char *a, char *b);
-void LAD(char *a, char *b);
+void LAD(char *a, char *b, char *x);
 
 void ADDA(char *a, char *b);
 void ADDL(char *a, char *b);
