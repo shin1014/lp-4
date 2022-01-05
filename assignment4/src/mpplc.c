@@ -15,7 +15,7 @@ void end_output(void){
 }
 
 void start_mpl(char* program_name){
-	fprintf(outfp, "$$%s\tSTART\n", program_name);
+	START(program_name);
 	LAD(gr0,"0",NULL);
 	CALL("L0001",NULL);
 	CALL("FLUSH",NULL);
@@ -79,5 +79,15 @@ void RET(void){fprintf(outfp,"\tRET\n");}
 
 void SVC(char *a, char *x){if(x==NULL) fprintf(outfp,"\tSVC\t%s\n",a);else fprintf(outfp,"\tSVC\t%s, %s\n",a,x);}
 void NOP(void){fprintf(outfp,"\tNOP\n");}
+
+void START(char* program_name){fprintf(outfp, "$$%s\tSTART\n", program_name);}
+void END(void){fprintf(outfp, "\tEND\n");}
+void DS(int num){fprintf(outfp, "\tDS\t%d\n", num);}
+void DC(int num){fprintf(outfp, "\tDC\t%d\n", num);}
+void IN(char *a, char *b){fprintf(outfp,"\tIN\t%s, %s\n", a, b);}
+void OUT(char *a,char *b){fprintf(outfp,"\tOUT\t%s, %s\n",a,b);}
+void RPOP(void){fprintf(outfp,"\tRPOP\n");}
+void RPUSH(void){fprintf(outfp,"\tRPUSH\n");}
+
 
 

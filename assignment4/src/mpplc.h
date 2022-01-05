@@ -71,3 +71,12 @@ void RET(void);
 void SVC(char *a, char *x);
 void NOP(void);
 
+void START(char* program_name);
+void END(void);
+void DS(int num);
+void DC(int num);
+void IN(char *a, char *b);
+void OUT(char *a,char *b);
+void RPOP(void);
+void RPUSH(void);
+
