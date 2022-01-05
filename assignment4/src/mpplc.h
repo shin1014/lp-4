@@ -39,3 +39,8 @@ void CPL(char *a, char *b);
 
 void CPA_ra(char *a, char *b, char *x);
 void CPL_ra(char *a, char *b, char *x);
+
+void SLA(char *a, char *b, char *x);
+void SRA(char *a, char *b, char *x);
+void SLL(char *a, char *b, char *x);
+void SRL(char *a, char *b, char *x);

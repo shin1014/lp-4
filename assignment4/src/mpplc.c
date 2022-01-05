@@ -15,10 +15,7 @@ void end_output(void){
 }
 
 void LD(char *a, char *b){fprintf(outfp,"\tLD\t%s, %s\n",a,b);}
-void LD_ra(char *a, char *b, char *x){
-	if(x==NULL) fprintf(outfp,"\tLD\t%s, %s\n",a,b);
-	else fprintf(outfp,"\tLD\t%s, %s, %s\n",a,b,x);
-}
+void LD_ra(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tLD\t%s, %s\n",a,b);else fprintf(outfp,"\tLD\t%s, %s, %s\n",a,b,x);}
 void ST(char *a, char *b){fprintf(outfp,"\tST\t%s, %s\n",a,b);}
 void LAD(char *a, char *b){fprintf(outfp,"\tLAD\t%s, %s\n",a,b);}
 
@@ -54,4 +51,8 @@ void CPL(char *a, char *b){fprintf(outfp,"\tCPA\t%s, %s\n",a,b);}
 void CPA_ra(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tCPA\t%s, %s\n",a,b);else fprintf(outfp,"\tCPA\t%s, %s, %s\n",a,b,x);}
 void CPL_ra(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tCPL\t%s, %s\n",a,b);else fprintf(outfp,"\tCPL\t%s, %s, %s\n",a,b,x);}
 
+void SLA(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSLA\t%s, %s\n",a,b);else fprintf(outfp,"\tSLA\t%s, %s, %s\n",a,b,x);}
+void SRA(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSRA\t%s, %s\n",a,b);else fprintf(outfp,"\tSRA\t%s, %s, %s\n",a,b,x);}
+void SLL(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSLL\t%s, %s\n",a,b);else fprintf(outfp,"\tSLL\t%s, %s, %s\n",a,b,x);}
+void SRL(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tSRL\t%s, %s\n",a,b);else fprintf(outfp,"\tSRL\t%s, %s, %s\n",a,b,x);}
 
