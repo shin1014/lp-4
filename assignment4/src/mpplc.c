@@ -13,3 +13,15 @@ void init_output(void){
 void end_output(void){
 	fclose(outfp);
 }
+
+void LD(char *a, char *b){
+	fprintf(outfp,"\tLD\t%s, %s\n",a,b);
+}
+
+void ST(char *a, char *b){
+	fprintf(outfp,"\tST\t%s, %s\n",a,b);
+}
+
+void LAD(char *a, char *b){
+	fprintf(outfp,"\tLAD\t%s, %s\n",a,b);
+}
