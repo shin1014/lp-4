@@ -55,4 +55,7 @@ void JUMP(char *a, char *x);
 void PUSH(char *a, char *x);
 void POP(char *a);
 
+void CALL(char *a, char *x);
+void RET(void);
+
 

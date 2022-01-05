@@ -66,6 +66,6 @@ void JUMP(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJUMP\t%s\n",a);else fpr
 void PUSH(char *a, char *x){if(x==NULL) fprintf(outfp,"\tPUSH\t%s\n",a);else fprintf(outfp,"\tPUSH\t%s, %s\n",a,x);}
 void POP(char *a){fprintf(outfp,"\tPUSH\t%s\n",a);}
 
-
-
+void CALL(char *a, char *x){if(x==NULL) fprintf(outfp,"\tCALL\t%s\n",a);else fprintf(outfp,"\tCALL\t%s, %s\n",a,x);}
+void RET(void){fprintf(outfp,"\tRET\n");}
 
