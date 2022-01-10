@@ -81,6 +81,7 @@ void RPOP(void);
 void RPUSH(void);
 
 void Label(char *label);
+void Label_procedure(char *label);
 void Label_DS(char *label, char *value);
 void Label_DC(char *label, char *value);
 

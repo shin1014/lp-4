@@ -21,6 +21,10 @@ struct ID *procedure;
 struct ID *tail_of_formal_parameters;
 struct FP *root_fp;
 
+#define NUMOFFP 100
+char FP_NAMES[NUMOFFP][MAXSTRSIZE]; /* for ST */
+int FPNUM;
+
 int ARRAYSIZE;
 
 int scan_pp(void);
@@ -219,11 +223,17 @@ int variable_name(void){
 		temp = id_record(string_attr);
 	}
 
+	if(IN_FP){
+		strcpy(FP_NAMES[FPNUM], string_attr);
+		FPNUM++;
+	}
+
 	char *label;
 	if(IN_FP || IN_VAR){
 		label = (char *)malloc(sizeof(char) * MAXSTRSIZE);
-		snprintf(label,MAXSTRSIZE,"$%s",string_attr);
-		DC(label, 0);
+		if(!strcmp(PROCEDURE_NAME,"")) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
+		else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* global */
+		DC(label, "0");
 	}
 	token = scan_pp();
 	if(temp->itp!=NULL){
@@ -279,7 +289,7 @@ int subprogram_declaration(void){
 	token = scan_pp();
 	IS_PROCNAME = 1;
 	procedure = id_record(string_attr);
-	strcpy(PROCEDURE_NAME, string_attr);	/* ADD */
+	strcpy(PROCEDURE_NAME, string_attr);
 	if(procedure_name() == ERROR) return(ERROR);
 	IS_PROCNAME = 0;
 	procedure->itp->ttype = TPPROC;
@@ -318,6 +328,7 @@ int formal_parameter(void){
 	int Type;
 	if(token != TLPAREN) return(error_("Symbol '(' is not found"));
 	IN_FP++;
+	FPNUM=0;
 	token = scan_pp();
 	head_of_variables = NULL; /* for record variable_names */
 	tail_of_formal_parameters = NULL; /* for record formal_parameters */
@@ -347,6 +358,20 @@ int formal_parameter(void){
 int compound_statement(void){
 	if(token != TBEGIN) return(error_("Keyword 'begin' is not found"));
 	IN_BEGIN++; /* for indent */
+	if(SUBPRO_DEC && IN_BEGIN==1){
+		Label_procedure(PROCEDURE_NAME);
+		POP(gr2);
+		int i;
+		char *fp_name;
+		fp_name = (char *)malloc(sizeof(char) * MAXSTRSIZE);
+		for(i=0;i<FPNUM;i++){ /* if procedure, assign formal parameters. */
+			POP(gr1);
+			sprintf(fp_name, "$%s%%%s", FP_NAMES[i], PROCEDURE_NAME);
+			ST(gr1, fp_name, NULL);
+		}
+		PUSH("0",gr2);
+	}
+
 	token = scan_pp();
 	if(statement() == ERROR) return(ERROR);
 	while(token == TSEMI){
@@ -355,6 +380,7 @@ int compound_statement(void){
 	}
 	if(token != TEND) return(error_("Keyword 'end' is not found"));
 	IN_BEGIN--; /* for indent */
+	if(SUBPRO_DEC && IN_BEGIN==1) RET();
 	token = scan_pp();
 	return(NORMAL);
 }

@@ -71,7 +71,7 @@ void JOV(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJOV\t%s\n",a);else fprin
 void JUMP(char *a, char *x){if(x==NULL) fprintf(outfp,"\tJUMP\t%s\n",a);else fprintf(outfp,"\tJUMP\t%s, %s\n",a,x);}
 
 void PUSH(char *a, char *x){if(x==NULL) fprintf(outfp,"\tPUSH\t%s\n",a);else fprintf(outfp,"\tPUSH\t%s, %s\n",a,x);}
-void POP(char *a){fprintf(outfp,"\tPUSH\t%s\n",a);}
+void POP(char *a){fprintf(outfp,"\tPOP\t%s\n",a);}
 
 void CALL(char *a, char *x){if(x==NULL) fprintf(outfp,"\tCALL\t%s\n",a);else fprintf(outfp,"\tCALL\t%s, %s\n",a,x);}
 void RET(void){fprintf(outfp,"\tRET\n");}
@@ -89,6 +89,7 @@ void RPOP(void){fprintf(outfp,"\tRPOP\n");}
 void RPUSH(void){fprintf(outfp,"\tRPUSH\n");}
 
 void Label(char *label){fprintf(outfp, "%s\n", label);}
+void Label_procedure(char *label){fprintf(outfp, "$%s\n", label);}
 void Label_DS(char *label, char *value){fprintf(outfp, "%s\tDS\t%s\n", label, value);}
 void Label_DC(char *label, char *value){fprintf(outfp, "%s\tDC\t%s\n", label, value);}
 
