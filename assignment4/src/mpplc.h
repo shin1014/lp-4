@@ -91,5 +91,10 @@ void WRITEBOOL(void);
 void WRITELINE(void);
 void FLUSH(void);
 
+void READCHAR(void);
+void READINT(void);
+void READLINE(void);
+void CONSTANTS(void);
+
 
 

@@ -250,3 +250,111 @@ void FLUSH(void){
   RET();
 }
 
+void READCHAR(void){
+  Label("READCHAR");
+  RPUSH();
+  LD_ra(gr5, "RPBBUF",NULL);
+  JZE("RC0",NULL);
+  ST(gr5, "0",gr1);
+  ST(gr0, "RPBBUF",NULL);
+  JUMP("RC3",NULL);
+  Label("RC0");
+  LD_ra(gr7, "INP",NULL);
+  LD_ra(gr6, "IBUFSIZE",NULL);
+  JNZ("RC1",NULL);
+  IN("IBUF", "IBUFSIZE");
+  LD(gr7, gr0);
+  Label("RC1");
+  CPA_ra(gr7, "IBUFSIZE",NULL);
+  JNZ("RC2",NULL);
+  LD_ra(gr5, "NEWLINE",NULL);
+  ST(gr5, "0",gr1);
+  ST(gr0, "IBUFSIZE",NULL);
+  ST(gr0, "INP",NULL);
+  JUMP("RC3",NULL);
+  Label("RC2");
+  LD_ra(gr5, "IBUF",gr7);
+  ADDA_ra(gr7, "ONE",NULL);
+  ST(gr5, "0",gr1);
+  ST(gr7, "INP",NULL);
+  Label("RC3");
+  RPOP();
+  RET();
+}
+
+void READINT(void){
+  Label("READINT");
+  RPUSH();
+  Label("RI1");
+  CALL("READCHAR",NULL);
+  LD_ra(gr7, "0",gr1);
+  CPA_ra(gr7, "SPACE",NULL);
+  JZE("RI1",NULL);
+  CPA_ra(gr7, "TAB",NULL);
+  JZE("RI1",NULL);
+  CPA_ra(gr7, "NEWLINE",NULL);
+  JZE("RI1",NULL);
+  LD_ra(gr5, "ONE",NULL);
+  CPA_ra(gr7, "MINUS",NULL);
+  JNZ("RI4",NULL);
+  LD_ra(gr5, gr0,NULL);
+  CALL("READCHAR",NULL);
+  LD_ra(gr7, "0",gr1);
+  Label("RI4");
+  LD_ra(gr6, gr0 ,NULL);
+  Label("RI2");
+  CPA_ra(gr7, "ZERO",NULL);
+  JMI("RI3",NULL);
+  CPA_ra(gr7, "NINE",NULL);
+  JPL("RI3",NULL);
+  MULA_ra(gr6, "TEN",NULL);
+  ADDA(gr6, gr7);
+  SUBA_ra(gr6, "ZERO",NULL);
+  CALL("READCHAR",NULL);
+  LD_ra(gr7, "0",gr1);
+  JUMP("RI2",NULL);
+  Label("RI3");
+  ST(gr7, "RPBBUF",NULL);
+  ST(gr6, "0",gr1);
+  CPA(gr5, gr0);
+  JNZ("RI5",NULL);
+  SUBA(gr5, gr6);
+  ST(gr5, "0",gr1);
+  Label("RI5");
+  RPOP();
+  RET();
+}
+
+void READLINE(void){
+  Label("READLINE");
+  ST(gr0, "IBUFSIZE",NULL);
+  ST(gr0, "INP",NULL);
+  ST(gr0, "RPBBUF",NULL);
+  RET();
+}
+
+void CONSTANTS(void){
+  Label_DC("ONE","1");
+  Label_DC("SIX","6");
+  Label_DC("TEN","10");
+  Label_DC("SPACE","#0020");
+  Label_DC("MINUS","#002D");
+  Label_DC("TAB","#0009");
+  Label_DC("ZERO","#0030");
+  Label_DC("NINE","#0039");
+  Label_DC("NEWLINE","#000A");
+  Label_DS("INTBUF","8");
+  Label_DC("OBUFSIZE","0");
+  Label_DC("IBUFSIZE","0");
+  Label_DC("INP", "0");
+  Label_DS("OBUF","257");
+  Label_DS("IBUF","257");
+  Label_DC("RPBBUF","0");
+  fprintf(outfp,"\tEND\n");
+}
+
+
+
+
+
+
