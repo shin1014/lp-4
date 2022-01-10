@@ -81,12 +81,17 @@ void NOP(void){fprintf(outfp,"\tNOP\n");}
 
 void START(char* program_name){fprintf(outfp, "$$%s\tSTART\n", program_name);}
 void END(void){fprintf(outfp, "\tEND\n");}
-void DS(char *label, int num){fprintf(outfp, "%s\tDS\t%d\n",label,num);}
-void DC(char *label, int num){fprintf(outfp, "%s\tDC\t%d\n",label,num);}
+void DS(char *label, char *value){fprintf(outfp, "%s\tDS\t%s\n",label,value);}
+void DC(char *label, char *value){fprintf(outfp, "%s\tDC\t%s\n",label,value);}
 void IN(char *a, char *b){fprintf(outfp,"\tIN\t%s, %s\n", a, b);}
 void OUT(char *a,char *b){fprintf(outfp,"\tOUT\t%s, %s\n",a,b);}
 void RPOP(void){fprintf(outfp,"\tRPOP\n");}
 void RPUSH(void){fprintf(outfp,"\tRPUSH\n");}
+
+void Label(char *label){fprintf(outfp, "%s\n", label);}
+void Label_DS(char *label, char *value){fprintf(outfp, "%s\tDS\t%s\n", label, value);}
+void Label_DC(char *label, char *value){fprintf(outfp, "%s\tDC\t%s\n", label, value);}
+
 
 
 
