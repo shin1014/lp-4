@@ -3,6 +3,6 @@ $$sample11	START
 	CALL	L0001
 	CALL	FLUSH
 	SVC	0
-$n	DC	0
-$sum	DC	0
-$data	DC	0
+$n	DC	(null)
+$sum	DC	(null)
+$data	DC	(null)

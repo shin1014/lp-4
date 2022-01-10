@@ -15,7 +15,7 @@ void start_mpl(char* program_name);
 
 void LD(char *a, char *b);
 void LD_ra(char *a, char *b, char *x);
-void ST(char *a, char *b);
+void ST(char *a, char *b, char *x);
 void LAD(char *a, char *b, char *x);
 
 void ADDA(char *a, char *b);
@@ -73,10 +73,23 @@ void NOP(void);
 
 void START(char* program_name);
 void END(void);
-void DS(char *label, int num);
-void DC(char *label, int num);
+void DS(char *label, char *value);
+void DC(char *label, char *value);
 void IN(char *a, char *b);
 void OUT(char *a,char *b);
 void RPOP(void);
 void RPUSH(void);
+
+void Label(char *label);
+void Label_DS(char *label, char *value);
+void Label_DC(char *label, char *value);
+
+void WRITECHAR(void);
+void WRITESTR(void);
+void WRITEINT(void);
+void WRITEBOOL(void);
+void WRITELINE(void);
+void FLUSH(void);
+
+
 
