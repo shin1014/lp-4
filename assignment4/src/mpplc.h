@@ -8,10 +8,25 @@
 #define gr7 "gr7"
 
 extern FILE *outfp;
+extern int LNUM;
+
+extern struct DC DC_root;
+extern struct DC *DC_tail;
+
+struct DC {
+	char *label;
+	char *value;
+	struct DC *nextp;
+};
 
 void init_output(void);
+void init_DC_list(void);
 void end_output(void);
 void start_mpl(char* program_name);
+char* newlabel(void);
+void new_DC(void);
+char *get_latestlabel(void);
+void print_DCs(void);
 
 void LD(char *a, char *b);
 void LD_ra(char *a, char *b, char *x);
@@ -96,6 +111,8 @@ void READCHAR(void);
 void READINT(void);
 void READLINE(void);
 void CONSTANTS(void);
+
+void OTHER_CSL(void);
 
 
 

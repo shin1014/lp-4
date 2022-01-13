@@ -68,6 +68,7 @@ int main(int nc, char *np[]) {
     init_localid();
 
     init_output();
+    init_DC_list();
 
     token = scan();
     parse_program();

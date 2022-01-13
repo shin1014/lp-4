@@ -1,12 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "mpplc.h"
+#include "token-list.h"
+
+#define LABELSIZE 6
+
+
+
+struct DC DC_root;
+struct DC *DC_tail;
+struct DC *DC_pretail;
 
 void init_output(void){
 	if ((outfp = fopen("test.mpl", "w")) == NULL) {/* open file "test.mpl" for write. */
 		printf("cannot open\n");	/* if can't open file */
 		exit(1);      	/* exit */
 	}
+}
+
+void init_DC_list(void){
+	DC_tail = &DC_root;
+	DC_pretail = NULL;
 }
 
 void end_output(void){
@@ -16,9 +32,44 @@ void end_output(void){
 void start_mpl(char* program_name){
 	START(program_name);
 	LAD(gr0,"0",NULL);
-	CALL("L0001",NULL);
+	CALL(newlabel(),NULL);
 	CALL("FLUSH",NULL);
 	SVC("0",NULL);
+}
+
+char* newlabel(void){
+	char *label;
+	label = (char*)malloc(sizeof(char)*LABELSIZE);
+	sprintf(label, "L%04d", LNUM);
+	LNUM++;
+	return label;
+}
+
+void new_DC(void){
+	char *value;
+	struct DC *DC_node;
+	value = (char*)malloc(sizeof(char)*(strlen(string_attr)+strlen("''")));
+	DC_node = (struct DC*)malloc(sizeof(DC));
+	if(token == TSTRING) sprintf(value, "'%s'", string_attr);
+	else sprintf(value, "%s", string_attr);
+	DC_node->label = newlabel();
+	DC_node->value = value;
+	DC_tail->nextp = DC_node;
+	DC_pretail = DC_tail;
+	DC_tail = DC_node;
+}
+
+void print_DCs(void){
+	struct DC *p;
+	p = DC_root.nextp;
+	while(p!=NULL){
+		Label_DC(p->label, p->value);
+		p = p->nextp;
+	}
+}
+
+char *get_latestlabel(void){
+	return DC_tail->label;
 }
 
 void LD(char *a, char *b){fprintf(outfp,"\tLD\t%s, %s\n",a,b);}
@@ -92,6 +143,38 @@ void Label(char *label){fprintf(outfp, "%s\n", label);}
 void Label_procedure(char *label){fprintf(outfp, "$%s\n", label);}
 void Label_DS(char *label, char *value){fprintf(outfp, "%s\tDS\t%s\n", label, value);}
 void Label_DC(char *label, char *value){fprintf(outfp, "%s\tDC\t%s\n", label, value);}
+
+void EOVF(void){
+  Label("EOVF");
+  CALL("WRITELINE",NULL);
+  LAD(gr1,"EOVF1",NULL);
+  LD(gr2,gr0);
+  CALL("WRITESTR",NULL);
+  CALL("WRITELINE",NULL);
+  SVC("1",NULL);
+  Label_DC("EOVF1", "\'***** Run-Time Error : Overflow *****\'");
+}
+void E0DIV(void){
+  Label("E0DIV");
+  JNZ("EOVF",NULL);
+  CALL("WRITELINE",NULL);
+  LAD(gr1, "E0DIV1",NULL);
+  LD(gr2, gr0);
+  CALL("WRITESTR",NULL);
+  CALL("WRITELINE",NULL);
+  SVC("2",NULL);
+  Label_DC("E0DIV1","\'***** Run-Time Error : Zero-Divide *****\'");
+}
+void EROV(void){
+  Label("EROV");
+  CALL("WRITELINE",NULL);
+  LAD(gr1, "EROV1",NULL);
+  LD(gr2, gr0);
+  CALL("WRITESTR",NULL);
+  CALL("WRITELINE",NULL);
+  SVC("3",NULL);
+  Label_DC("EROV1", "\'***** Run-Time Error : Range-Over in Array Index *****\'");
+}
 
 void WRITECHAR(void){
   Label("WRITECHAR");
@@ -352,6 +435,22 @@ void CONSTANTS(void){
   Label_DS("IBUF","257");
   Label_DC("RPBBUF","0");
   fprintf(outfp,"\tEND\n");
+}
+
+void OTHER_CSL(void){
+  EOVF();
+  E0DIV();
+  EROV();
+  WRITECHAR();
+  WRITESTR();
+  WRITEINT();
+  WRITEBOOL();
+  WRITELINE();
+  FLUSH();
+  READCHAR();
+  READINT();
+  READLINE();
+  CONSTANTS();
 }
 
 

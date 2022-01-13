@@ -77,6 +77,9 @@ int IN_VAR = 0;
 int IS_PROCNAME = 0;
 
 
+int LNUM;
+
+
 int scan_pp(void){
 	if(!PP) return scan();
 	else{
@@ -144,6 +147,7 @@ void print_tab(int tab_num){
 }
 
 int parse_program(void){
+	LNUM=1;
 	if(token != TPROGRAM) return(error_("Keyword 'program' is not found"));
 	token = scan_pp();
 	if(token != TNAME) return(error_("Keyword 'name' is not found"));
@@ -155,6 +159,10 @@ int parse_program(void){
 	if(block() == ERROR) return (ERROR);
 	if(token != TDOT) return(error_("'.'is not found at the end of program"));
 	token = scan_pp();
+
+	print_DCs();
+	OTHER_CSL();
+
 	print_cross_referencer();
 
 	return(NORMAL);
@@ -231,8 +239,8 @@ int variable_name(void){
 	char *label;
 	if(IN_FP || IN_VAR){
 		label = (char *)malloc(sizeof(char) * MAXSTRSIZE);
-		if(!strcmp(PROCEDURE_NAME,"")) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
-		else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* global */
+		if(!SUBPRO_DEC) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
+		else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* local */
 		DC(label, "0");
 	}
 	token = scan_pp();
@@ -369,7 +377,7 @@ int compound_statement(void){
 			sprintf(fp_name, "$%s%%%s", FP_NAMES[i], PROCEDURE_NAME);
 			ST(gr1, fp_name, NULL);
 		}
-		PUSH("0",gr2);
+		PUSH(gr0,gr2);
 	}
 
 	token = scan_pp();
@@ -710,8 +718,15 @@ int input_statement(void){
 }
 
 int output_statement(void){/* Irregular style*/
-	if(token == TWRITE) token = scan_pp();
-	else if(token == TWRITELN) token = scan_pp();
+	int isln;
+	if(token == TWRITE){
+		token = scan_pp();
+		isln = 0;
+	}
+	else if(token == TWRITELN){
+		token = scan_pp();
+		isln = 1;
+	}
 	else return(error_("Keyword 'write' or 'writeln' is not found"));
 	if(token == TLPAREN){
 		token = scan_pp();
@@ -723,6 +738,7 @@ int output_statement(void){/* Irregular style*/
 		if(token != TRPAREN) return(error_("Symbol ')' is not found"));
 		token = scan_pp();
 	}
+	if(isln) CALL("WRITELINE",NULL);
 	return(NORMAL);
 }
 
@@ -732,16 +748,26 @@ int output_format(void){
 			token == TNUMBER || token == TFALSE || token == TTRUE || (token == TSTRING && strlen(string_attr)==1) ||
 			token == TLPAREN || token == TNOT || token == TINTEGER || token == TBOOLEAN || token == TCHAR){
 		Type = expression();
-		if(Type != TPINT && Type == TPCHAR && Type == TPBOOL) return(error_("expression in output_format must be standerd_type."));
+		POP(gr1);
+		if(Type != TPINT && Type != TPCHAR && Type != TPBOOL) return(error_("expression in output_format must be standerd_type."));
 		if(token == TCOLON){
 			token = scan_pp();
 			if(token != TNUMBER) return(error_("NUMBER is not found"));
+			ST(string_attr,gr2, NULL);
 			token = scan_pp();
-		}
+		}else ST(gr0, gr2, NULL);
+
+		if(Type == TPINT) CALL("WRITEINT", NULL);
+		else if(Type == TPCHAR) CALL("WRITECHAR", NULL);
+		else if(Type == TPBOOL) CALL("WRITEBOOL", NULL);
+
 		return(NORMAL);
 	}
 	else if(token == TSTRING){
 		if(strlen(string_attr) == 1) return(error_("String length in output_format must be 0, or above 2"));
+		new_DC();
+		LAD(gr1, get_latestlabel(), NULL);
+		CALL("WRITESTR", NULL);
 		token = scan_pp();
 		return(NORMAL);
 	}
