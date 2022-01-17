@@ -12,6 +12,9 @@ $kazuyomikomi
 	LAD	gr1, L0002
 	CALL	WRITESTR
 	CALL	WRITELINE
+	LD	gr1, $n%kazuyomikomi
+	CALL	READINT
+	CALL	READLN
 $sum	DC	0
 $wakakidasi
 	POP	gr2
@@ -35,6 +38,9 @@ $goukei
 	POP	gr1
 	ST	gr1, $s%goukei
 	PUSH	gr0, gr2
+	LD	gr1, $data%goukei
+	CALL	READINT
+	CALL	READLN
 	RET
 $n	DC	0
 L0002	DC	'input the number of data'

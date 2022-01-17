@@ -78,6 +78,7 @@ int IS_PROCNAME = 0;
 
 
 int LNUM;
+char LATESTLABEL[MAXSTRSIZE];
 
 
 int scan_pp(void){
@@ -236,12 +237,13 @@ int variable_name(void){
 		FPNUM++;
 	}
 
-	char *label;
-	if(IN_FP || IN_VAR){
-		label = (char *)malloc(sizeof(char) * MAXSTRSIZE);
-		if(!SUBPRO_DEC) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
-		else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* local */
+	char label[MAXSTRSIZE];
+	if(!SUBPRO_DEC) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
+	else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* local */
+	if(IN_FP || IN_VAR){ /*declear part*/
 		DC(label, "0");
+	}else{ /*refer part*/
+		strcpy(LATESTLABEL, label);
 	}
 	token = scan_pp();
 	if(temp->itp!=NULL){
@@ -698,22 +700,29 @@ int relational_operator(void){
 }
 
 int input_statement(void){
-	int Type;
-	if(token == TREAD) token = scan_pp();
-	else if(token == TREADLN) token = scan_pp();
+	int Type, isln;
+	if(token == TREAD){token = scan_pp(); isln = 0;}
+	else if(token == TREADLN){token = scan_pp(); isln = 1;}
 	else return(error_("Keyword 'read' or 'readln' is not found"));
 	if(token == TLPAREN){
 		token = scan_pp();
 		if((Type = variable()) == ERROR) return(ERROR);
-		if(Type != TPINT && Type != TPCHAR) return(error_("variable in input_statement must be integer or char"));
+		LD(gr1, LATESTLABEL);
+		if(Type == TPINT) CALL("READINT", NULL);
+		else if(Type == TPCHAR) CALL("READCHAR", NULL);
+		else return(error_("variable in input_statement must be integer or char"));
 		while(token == TCOMMA){
 			token = scan_pp();
 			if((Type = variable()) == ERROR) return(ERROR);
-			if(Type != TPINT && Type != TPCHAR) return(error_("variable in input_statement must be integer or char"));
+			LD(gr1, LATESTLABEL);
+			if(Type == TPINT) CALL("READINT", NULL);
+			else if(Type == TPCHAR) CALL("READCHAR", NULL);
+			else return(error_("variable in input_statement must be integer or char"));
 		}
 		if(token != TRPAREN) return(error_("Symbol ')' is not found"));
 		token = scan_pp();
 	}
+	if(isln) CALL("READLN",NULL);
 	return(NORMAL);
 }
 
