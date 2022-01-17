@@ -8,25 +8,25 @@ $kazuyomikomi
 	POP	gr2
 	POP	gr1
 	ST	gr1, $n%kazuyomikomi
-	PUSH	gr0, gr2
+	PUSH	0, gr2
 	LAD	gr1, L0002
+	LD	gr2, gr0
 	CALL	WRITESTR
 	CALL	WRITELINE
 	LD	gr1, $n%kazuyomikomi
 	CALL	READINT
 	CALL	READLN
+	RET
 $sum	DC	0
 $wakakidasi
-	POP	gr2
-	POP	gr1
-	ST	gr1, $n%wakakidasi
-	PUSH	gr0, gr2
 	LAD	gr1, L0003
+	LD	gr2, gr0
 	CALL	WRITESTR
-	POP	gr1
-	ST	gr0, gr2
+	LD	gr1, $sum
+	LD	gr2, gr0
 	CALL	WRITEINT
 	CALL	WRITELINE
+	RET
 $data	DC	0
 $n%goukei	DC	0
 $s%goukei	DC	0
@@ -35,9 +35,10 @@ $goukei
 	POP	gr2
 	POP	gr1
 	ST	gr1, $n%goukei
+	POP	gr2
 	POP	gr1
 	ST	gr1, $s%goukei
-	PUSH	gr0, gr2
+	PUSH	0, gr2
 	LD	gr1, $data%goukei
 	CALL	READINT
 	CALL	READLN

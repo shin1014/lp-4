@@ -240,9 +240,13 @@ int variable_name(void){
 	char label[MAXSTRSIZE];
 	if(!SUBPRO_DEC) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
 	else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* local */
+	struct ID *id;
 	if(IN_FP || IN_VAR){ /*declear part*/
 		DC(label, "0");
 	}else{ /*refer part*/
+		id = search_idtab(string_attr);
+		if(!strcmp(id->procname, " ")) snprintf(label,MAXSTRSIZE,"$%s",id->name); /* global */
+		else snprintf(label,MAXSTRSIZE,"$%s%%%s",id->name, id->procname); /* local */
 		strcpy(LATESTLABEL, label);
 	}
 	token = scan_pp();
@@ -298,6 +302,7 @@ int subprogram_declaration(void){
 	SUBPRO_DEC++; /* for indent */
 	token = scan_pp();
 	IS_PROCNAME = 1;
+	FPNUM=0;
 	procedure = id_record(string_attr);
 	strcpy(PROCEDURE_NAME, string_attr);
 	if(procedure_name() == ERROR) return(ERROR);
@@ -338,7 +343,6 @@ int formal_parameter(void){
 	int Type;
 	if(token != TLPAREN) return(error_("Symbol '(' is not found"));
 	IN_FP++;
-	FPNUM=0;
 	token = scan_pp();
 	head_of_variables = NULL; /* for record variable_names */
 	tail_of_formal_parameters = NULL; /* for record formal_parameters */
@@ -370,16 +374,15 @@ int compound_statement(void){
 	IN_BEGIN++; /* for indent */
 	if(SUBPRO_DEC && IN_BEGIN==1){
 		Label_procedure(PROCEDURE_NAME);
-		POP(gr2);
 		int i;
-		char *fp_name;
-		fp_name = (char *)malloc(sizeof(char) * MAXSTRSIZE);
+		char fp_name[MAXSTRSIZE];
 		for(i=0;i<FPNUM;i++){ /* if procedure, assign formal parameters. */
+			POP(gr2);
 			POP(gr1);
 			sprintf(fp_name, "$%s%%%s", FP_NAMES[i], PROCEDURE_NAME);
 			ST(gr1, fp_name, NULL);
 		}
-		PUSH(gr0,gr2);
+		if(FPNUM) PUSH("0",gr2);
 	}
 
 	token = scan_pp();
@@ -390,7 +393,7 @@ int compound_statement(void){
 	}
 	if(token != TEND) return(error_("Keyword 'end' is not found"));
 	IN_BEGIN--; /* for indent */
-	if(SUBPRO_DEC && IN_BEGIN==1) RET();
+	if(SUBPRO_DEC && !IN_BEGIN) RET();
 	token = scan_pp();
 	return(NORMAL);
 }
@@ -722,7 +725,7 @@ int input_statement(void){
 		if(token != TRPAREN) return(error_("Symbol ')' is not found"));
 		token = scan_pp();
 	}
-	if(isln) CALL("READLN",NULL);
+	if(isln) CALL("HEADLINE",NULL);
 	return(NORMAL);
 }
 
@@ -757,14 +760,20 @@ int output_format(void){
 			token == TNUMBER || token == TFALSE || token == TTRUE || (token == TSTRING && strlen(string_attr)==1) ||
 			token == TLPAREN || token == TNOT || token == TINTEGER || token == TBOOLEAN || token == TCHAR){
 		Type = expression();
-		POP(gr1);
+
+		if(token/* expression is only variable */) LD(gr1, LATESTLABEL);
+		else POP(gr1);
+
 		if(Type != TPINT && Type != TPCHAR && Type != TPBOOL) return(error_("expression in output_format must be standerd_type."));
 		if(token == TCOLON){
 			token = scan_pp();
 			if(token != TNUMBER) return(error_("NUMBER is not found"));
 			ST(string_attr,gr2, NULL);
 			token = scan_pp();
-		}else ST(gr0, gr2, NULL);
+		}else{
+			/* ST(gr0, gr2, NULL); from where? */
+			LD(gr2, gr0);
+		}
 
 		if(Type == TPINT) CALL("WRITEINT", NULL);
 		else if(Type == TPCHAR) CALL("WRITECHAR", NULL);
@@ -776,6 +785,7 @@ int output_format(void){
 		if(strlen(string_attr) == 1) return(error_("String length in output_format must be 0, or above 2"));
 		new_DC();
 		LAD(gr1, get_latestlabel(), NULL);
+		LD(gr2, gr0);
 		CALL("WRITESTR", NULL);
 		token = scan_pp();
 		return(NORMAL);
