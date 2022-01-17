@@ -73,12 +73,15 @@ int IN_IF = 0;
 int IN_ELSE = 0;
 int IN_FP = 0;
 int IN_VAR = 0;
+int IN_ASSIGN = 0;
+int IN_LEFTPART = 0;
 
 int IS_PROCNAME = 0;
 
 
 int LNUM;
 char LATESTLABEL[MAXSTRSIZE];
+
 
 
 int scan_pp(void){
@@ -540,25 +543,25 @@ int return_statement(void){
 
 int assignment_statement(void){
 	int LType, RType;
+	IN_ASSIGN++;
 	if((LType = left_part()) == ERROR) return(ERROR);
 	if(token != TASSIGN) return(error_("Symbol ':=' is not found"));
 	token = scan_pp();
 	if((RType = expression()) == ERROR) return(ERROR);
 	if(LType != RType) return(error_("Left part and Right part must be same types in assignment_statement."));
-
-	if(1/* only variable */) LAD(gr1,"0", NULL); /* gr1 <- "result of expression" */
-	/*else LD();*/
 	POP(gr2); /* POP left_part from STACK.(by left_part()) */
 	ST(gr1, "0", gr2); /* gr1 -> gr2 */
+	IN_ASSIGN--;
 	return(NORMAL);
 }
 
 int left_part(void){
 	int Type;
+	IN_LEFTPART++;
 	Type = variable();
-	LD(gr1, LATESTLABEL); /* LATESTLABEL -> gr1 */
 	PUSH("0", gr1); /* gr1 -> STACK */
 	/* left_part is top of stack. */
+	IN_LEFTPART--;
 	return Type;
 }
 
@@ -575,7 +578,7 @@ int variable(void){
 		if(token != TRSQPAREN) return(error_("Symbol ']' is not found"));
 		token = scan_pp();
 		Type = ArrayType;
-	}
+	}else if(IN_LEFTPART) LD(gr1,LATESTLABEL);
 	return(Type);
 }
 
@@ -587,6 +590,8 @@ int expression(void){
 		token = scan_pp();
 		if(simple_expression() == ERROR) return(ERROR);
 	}
+	/*temp*/
+	if(IN_ASSIGN) LAD(gr1, "0", NULL);
 	return(Type);
 }
 
@@ -595,6 +600,7 @@ int simple_expression(void){
 	int RType;
 	int Mode;	/* TPINT:int , TPBOOL:bool*/
 	int flag;
+	int ope;
 	flag=0;
 
 	if(token == TPLUS){/* Constraint rule */
@@ -603,19 +609,28 @@ int simple_expression(void){
 	}
 	else if(token == TMINUS){/* Constraint rule */
 		token = scan_pp();
-		flag = 1;
+		flag = -1;
 	}
 
 	if((Type = term()) == ERROR) return(ERROR);
-	if(flag == 1 && Type != TPINT){/* Constraint rule */
+	if(flag != 1 && Type != TPINT){/* Constraint rule */
 		return(error_("the term after + or - must be integer."));
 	}
 	while(token == TPLUS || token == TMINUS || token == TOR){
 		if(token == TPLUS || token == TMINUS) Mode = TPINT;
 		else if(token == TOR) Mode = TPBOOL;
+		ope = token;
 		token = scan_pp();
 		if((RType = term()) == ERROR) return(ERROR);
 		if(Type != Mode || Mode != RType) return(error_("operator error."));
+		POP(gr2);
+		POP(gr1);
+		if(flag == -1) MULA(gr1, "-1");
+		if(ope == TPLUS) ADDA(gr1, gr2);
+		else if(ope == TMINUS) SUBA(gr1, gr2);
+		else if(ope == TOR) ADDL(gr1, gr2);
+		JOV("EOVF", NULL);
+		PUSH("0", gr1);
 	}
 	return(Type);
 }
@@ -638,13 +653,9 @@ int factor(void){	/* Irregular style*/
 	int Type;
 	int temp;
 	if(token == TNAME){	/* variable */
-		/* if((Type = variable()) == ERROR) return(ERROR);
-		return(Type); */
 		return variable();
 	}
 	else if(token == TNUMBER || token == TTRUE || token == TFALSE || token ==TSTRING){/* constant */
-		/* if((Type = constant()) == ERROR) return(ERROR);
-		return(Type);*/
 		return constant();
 	}
 	else if(token == TLPAREN){

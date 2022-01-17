@@ -49,10 +49,20 @@ L0004
 	CALL	HEADLINE
 	LD	gr1,	$s%goukei
 	PUSH	0,gr1
+	POP	gr2
+	POP	gr1
+	ADDA	gr1,gr2
+	JOV	EOVF
+	PUSH	0,gr1
 	LAD	gr1,	0
 	POP	gr2
 	ST	gr1,0,gr2
 	LD	gr1,	$n%goukei
+	PUSH	0,gr1
+	POP	gr2
+	POP	gr1
+	SUBA	gr1,gr2
+	JOV	EOVF
 	PUSH	0,gr1
 	LAD	gr1,	0
 	POP	gr2
