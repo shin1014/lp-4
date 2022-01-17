@@ -590,8 +590,6 @@ int expression(void){
 		token = scan_pp();
 		if(simple_expression() == ERROR) return(ERROR);
 	}
-	/*temp*/
-	if(IN_ASSIGN) LAD(gr1, "0", NULL);
 	return(Type);
 }
 
@@ -740,11 +738,17 @@ int factor(void){	/* Irregular style*/
 }
 
 int constant(void){
-	if(token == TNUMBER){ token = scan_pp(); return(TPINT);}
-	else if(token == TFALSE) { token = scan_pp(); return(TPBOOL);}
-	else if(token == TTRUE) { token = scan_pp(); return(TPBOOL);}
+	if(token == TNUMBER){
+		if(num_attr == 0) LAD(gr1, "0", NULL);
+		else LAD(gr1, LATESTLABEL, NULL);
+		token = scan_pp();
+		return(TPINT);
+	}
+	else if(token == TFALSE) {LD(gr1, "0"); token = scan_pp(); return(TPBOOL);}
+	else if(token == TTRUE) { LD(gr1, "1"); token = scan_pp(); return(TPBOOL);}
 	else if(token == TSTRING) {
 		if(strlen(string_attr)!=1) return(error_("Constant char's length must be 1."));
+		new_DC();
 		token = scan_pp();
 		return(TPCHAR);
 	}

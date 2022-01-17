@@ -44,6 +44,7 @@ $goukei
 	POP	gr2
 	ST	gr1,0,gr2
 L0004
+	LAD	gr1,	0
 	LD	gr1,	$data%goukei
 	CALL	READINT
 	CALL	HEADLINE
@@ -54,21 +55,21 @@ L0004
 	ADDA	gr1,gr2
 	JOV	EOVF
 	PUSH	0,gr1
-	LAD	gr1,	0
 	POP	gr2
 	ST	gr1,0,gr2
 	LD	gr1,	$n%goukei
 	PUSH	0,gr1
+	LAD	gr1,	$n%goukei
 	POP	gr2
 	POP	gr1
 	SUBA	gr1,gr2
 	JOV	EOVF
 	PUSH	0,gr1
-	LAD	gr1,	0
 	POP	gr2
 	ST	gr1,0,gr2
 	RET
 $n	DC	0
+	LAD	gr1,	$n
 	POP	gr2
 	POP	gr1
 	MULA	gr1,gr2
