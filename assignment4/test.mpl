@@ -69,6 +69,11 @@ L0004
 	ST	gr1,0,gr2
 	RET
 $n	DC	0
+	POP	gr2
+	POP	gr1
+	MULA	gr1,gr2
+	JOV	EOVF
+	PUSH	0,gr1
 L0002	DC	'input the number of data'
 L0003	DC	'Sum of data = '
 EOVF

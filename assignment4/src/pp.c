@@ -639,12 +639,22 @@ int term(void){
 	int Type;
 	int Mode;
 	int RType;
+	int ope;
 	if((Type = factor()) == ERROR) return(ERROR);
 	while(token == TSTAR || token == TDIV || token == TAND){
 		Mode = multiplicative_operator();
+		ope = token;
 		token = scan_pp();
 		if((RType = factor()) == ERROR) return(ERROR);
 		if(Type != Mode || Mode != RType) return(error_("operator error."));
+
+		POP(gr2);
+		POP(gr1);
+		if(ope == TSTAR) MULA(gr1, gr2);
+		else if(ope == TDIV) DIVA(gr1, gr2);
+		else if(ope == TAND) MULL(gr1, gr2);
+		JOV("EOVF", NULL);
+		PUSH("0", gr1);
 	}
 	return(Type);
 }
