@@ -374,10 +374,10 @@ int compound_statement(void){
 	IN_BEGIN++; /* for indent */
 	if(SUBPRO_DEC && IN_BEGIN==1){
 		Label_procedure(PROCEDURE_NAME);
+		if(FPNUM) POP(gr2);
 		int i;
 		char fp_name[MAXSTRSIZE];
-		for(i=0;i<FPNUM;i++){ /* if procedure, assign formal parameters. */
-			POP(gr2);
+		for(i=FPNUM-1;i>=0;i--){ /* if procedure, assign formal parameters. */
 			POP(gr1);
 			sprintf(fp_name, "$%s%%%s", FP_NAMES[i], PROCEDURE_NAME);
 			ST(gr1, fp_name, NULL);
@@ -544,14 +544,21 @@ int assignment_statement(void){
 	token = scan_pp();
 	if((RType = expression()) == ERROR) return(ERROR);
 	if(LType != RType) return(error_("Left part and Right part must be same types in assignment_statement."));
+
+	if(1/* only variable */) LAD(gr1,"0", NULL); /* gr1 <- "result of expression" */
+	/*else LD();*/
+	POP(gr2); /* POP left_part from STACK.(by left_part()) */
+	ST(gr1, "0", gr2); /* gr1 -> gr2 */
 	return(NORMAL);
 }
 
 int left_part(void){
-	/* int Type;
-	if((Type = variable()) == ERROR) return(ERROR);
-	return(Type); */
-	return variable();
+	int Type;
+	Type = variable();
+	LD(gr1, LATESTLABEL); /* LATESTLABEL -> gr1 */
+	PUSH("0", gr1); /* gr1 -> STACK */
+	/* left_part is top of stack. */
+	return Type;
 }
 
 int variable(void){
