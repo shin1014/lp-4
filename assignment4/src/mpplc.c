@@ -72,6 +72,10 @@ char *get_latestlabel(void){
 	return DC_tail->label;
 }
 
+void print_label(char *label){
+	fprintf(outfp, "%s\n", label);
+}
+
 void LD(char *a, char *b){fprintf(outfp,"\tLD\t%s,\t%s\n",a,b);}
 void LD_ra(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tLD\t%s,\t%s\n",a,b);else fprintf(outfp,"\tLD\t%s,\t%s,\t%s\n",a,b,x);}
 void ST(char *a, char *b, char *x){if(x==NULL) fprintf(outfp,"\tST\t%s,\t%s\n",a,b);else fprintf(outfp,"\tST\t%s,%s,%s\n",a,b,x);}

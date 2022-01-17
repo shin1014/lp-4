@@ -463,6 +463,7 @@ int condition_statement(void){
 int iteration_statement(void){
 	int Type;
 	if(token != TWHILE) return(error_("Keyword 'while' is not found"));
+	print_label(newlabel());
 	token = scan_pp();
 	if((Type = expression()) == ERROR) return(ERROR);
 	if(Type != TPBOOL) return(error_("while statement must be boolean."));

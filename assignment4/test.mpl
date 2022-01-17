@@ -43,6 +43,7 @@ $goukei
 	LAD	gr1,	0
 	POP	gr2
 	ST	gr1,0,gr2
+L0004
 	LD	gr1,	$data%goukei
 	CALL	READINT
 	CALL	HEADLINE
