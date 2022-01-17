@@ -679,6 +679,9 @@ int factor(void){	/* Irregular style*/
 		token = scan_pp();
 		if((Type = factor()) == ERROR) return(ERROR);
 		if(Type != TPBOOL) return(error_("not must have boolean value."));
+
+		POP(gr1);
+		XOR(gr1, "1");
 		return(Type);
 	}
 	else if(token == TINTEGER || token == TBOOLEAN || token == TCHAR){
@@ -689,6 +692,47 @@ int factor(void){	/* Irregular style*/
 		if((temp = expression()) == ERROR) return(ERROR);
 		if(temp!=TPINT && temp!=TPCHAR && temp!=TPBOOL) return(error_("standerd_type and expression_type must be same."));
 		if(token != TRPAREN) return(error_("Symbol ')' is not found"));
+
+		POP(gr1);
+		if(Type == TPINT){
+			if(temp == TPINT){
+
+			}else if(temp == TPBOOL){
+				CPA(gr1, gr0);
+				JNZ(newlabel(), NULL);
+				print_label(get_latestlabel());
+				ST("1", gr1, NULL);
+			}else if(temp == TPCHAR){
+				XOR(gr1, "#FFFF");
+				ADDA(gr1, "1");
+			}
+		}else if(Type == TPBOOL){
+			if(temp == TPINT){
+				CPA(gr1,gr0);
+				JNZ(newlabel(), NULL);
+				print_label(get_latestlabel());
+				ST("1", gr1, NULL);
+			}else if(Type == TPBOOL){
+
+			}else if(Type == TPCHAR){
+				CPA(gr1, gr0);
+				JNZ(newlabel(), NULL);
+				print_label(get_latestlabel());
+				ST("1", gr1, NULL);
+			}
+		}else if(Type == TPCHAR){
+			if(temp == TPINT){
+
+			}else if(Type == TPBOOL){
+				CPA(gr1,gr0);
+				JNZ(newlabel(), NULL);
+				print_label(get_latestlabel());
+				ST("1", gr1, NULL);
+			}else if(Type == TPCHAR){
+			}
+		}
+		PUSH("0", gr1);
+
 		token = scan_pp();
 		return(Type);
 	}
