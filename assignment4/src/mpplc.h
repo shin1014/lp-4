@@ -28,6 +28,7 @@ void new_DC(void);
 char *get_latestlabel(void);
 void print_DCs(void);
 void print_label(char *label);
+char *make_procedure_label(char *procedure_name);
 
 void LD(char *a, char *b);
 void LD_ra(char *a, char *b, char *x);

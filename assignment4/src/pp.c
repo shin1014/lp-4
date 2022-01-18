@@ -75,6 +75,10 @@ int IN_FP = 0;
 int IN_VAR = 0;
 int IN_ASSIGN = 0;
 int IN_LEFTPART = 0;
+int IN_EXPRESSION = 0;
+int IN_INPUT = 0;
+int IN_MAIN = 0;
+int IN_CALL = 0;
 
 int IS_PROCNAME = 0;
 
@@ -181,7 +185,9 @@ int block(void){
 			if(subprogram_declaration()==ERROR) return(ERROR);
 		}
 	}
+	IN_MAIN++;
 	if(compound_statement() == ERROR) return(ERROR/*error_("compound statement is not found")*/);
+	IN_MAIN--;
 	return(NORMAL);
 }
 
@@ -375,6 +381,7 @@ int formal_parameter(void){
 int compound_statement(void){
 	if(token != TBEGIN) return(error_("Keyword 'begin' is not found"));
 	IN_BEGIN++; /* for indent */
+	if(IN_MAIN) print_label("L0001");
 	if(SUBPRO_DEC && IN_BEGIN==1){
 		Label_procedure(PROCEDURE_NAME);
 		if(FPNUM) POP(gr2);
@@ -465,14 +472,23 @@ int condition_statement(void){
 
 int iteration_statement(void){
 	int Type;
+	char *looptop_label, *do_label;
 	if(token != TWHILE) return(error_("Keyword 'while' is not found"));
-	print_label(newlabel());
+	looptop_label = newlabel();
+	print_label(looptop_label);
 	token = scan_pp();
+	do_label = newlabel();
 	if((Type = expression()) == ERROR) return(ERROR);
 	if(Type != TPBOOL) return(error_("while statement must be boolean."));
+	//POP(gr1);
+	CPA(gr1,gr0);
+	JZE(do_label, NULL);
+	//JUMP("L[LOOPEND]", NULL);
 	if(token != TDO) return(error_("Keyword 'do' is not found"));
 	token = scan_pp();
 	if(statement() == ERROR) return(ERROR);
+	JUMP(looptop_label,NULL);
+	print_label(do_label);
 	return(NORMAL);
 }
 
@@ -500,6 +516,7 @@ int call_statement(void){
 	if(token != TCALL) return(error_("Keyword 'call' is not found"));
 	token = scan_pp();
 	procedure = id_record(string_attr);
+	IN_CALL++;
 	if(strcmp(procedure->name,PROCEDURE_NAME)==0){	/* if Recursive call */
 		return(error_("Cannot Recursive call in MPPL."));
 	}
@@ -510,6 +527,8 @@ int call_statement(void){
 		if(token != TRPAREN) return(error_("Keyword ')' is not found"));
 		token = scan_pp();
 	}
+	CALL(make_procedure_label(procedure->name), NULL);
+	IN_CALL--;
 	return(NORMAL);
 }
 
@@ -568,6 +587,8 @@ int left_part(void){
 int variable(void){
 	int Type;
 	int ArrayType;
+	char name[MAXSTRSIZE];
+	strcpy(name, string_attr);
 	if((Type = variable_name()) == ERROR) return(ERROR);
 	if(token == TLSQPAREN){
 		ArrayType = TPARRAY + Type;
@@ -578,23 +599,32 @@ int variable(void){
 		if(token != TRSQPAREN) return(error_("Symbol ']' is not found"));
 		token = scan_pp();
 		Type = ArrayType;
-	}else if(IN_LEFTPART) LD(gr1,LATESTLABEL);
+	}else if(IN_LEFTPART || IN_EXPRESSION || IN_INPUT){
+		if(search_idtab(name)->ispara) LD(gr1,LATESTLABEL);
+		else LAD(gr1,LATESTLABEL, NULL);
+	}
 	return(Type);
 }
 
 int expression(void){
 	int Type;
 	int ope=0;
-	char *truelabel, *falselabel;
+	char *truelabel=NULL, *falselabel=NULL;
+	IN_EXPRESSION++;
 	if((Type = simple_expression()) == ERROR) return(ERROR);
 	while(token == TEQUAL || token == TNOTEQ || token == TLE || token == TLEEQ || token == TGR || token == TGREQ){
 		Type = relational_operator();
 		ope = token;
+
+		/*temp*/
+		LD_ra(gr1,"0",gr1);
+		PUSH("0",gr1);
+
 		token = scan_pp();
 		if(simple_expression() == ERROR) return(ERROR);
 		POP(gr2);
-		POP(gr1);
-		CPA(gr1, gr2);
+		/*temp POP(gr1);*/
+		CPA(gr2, gr1);
 		if(ope == TGR){ truelabel = newlabel(); JPL(truelabel, NULL); } /* > */
 		else if(ope == TLE){ truelabel = newlabel(); JMI(truelabel, NULL);} /* < */
 		else if(ope == TEQUAL){ truelabel = newlabel(); JZE(truelabel, NULL);} /* = */
@@ -612,11 +642,23 @@ int expression(void){
 			print_label(falselabel);
 		}else error_(" undefined operator.");
 
-		ST("0", gr1, NULL); /* FALSE -> gr1 */
-		print_label(truelabel);
-		ST("1", gr1, NULL); /* TRUE -> gr1 */
+		LD(gr1,gr0); // ST("0", gr1, NULL); /* FALSE -> gr1 */
+		if(falselabel==NULL){
+			falselabel = newlabel();
+			JUMP(falselabel, NULL); /* temp, not correct */
+			print_label(truelabel);
+			LAD(gr1, "1", NULL); // ST("1", gr1, NULL); /* TRUE -> gr1 */
+			print_label(falselabel);
+		}else{
+			JUMP(falselabel, NULL); /* temp, not correct */
+			print_label(truelabel);
+			LAD(gr1, "1", NULL); // ST("1", gr1, NULL); /* TRUE -> gr1 */
+		}
+
+
 	}
-	if(ope!=0) PUSH("0", gr1);
+	if(IN_CALL) PUSH("0", gr1);
+	IN_EXPRESSION--;
 	return(Type);
 }
 
@@ -644,19 +686,25 @@ int simple_expression(void){
 	while(token == TPLUS || token == TMINUS || token == TOR){
 		if(token == TPLUS || token == TMINUS) Mode = TPINT;
 		else if(token == TOR) Mode = TPBOOL;
+
+		/*temp*/
+		LD_ra(gr1,"0",gr1);
+		PUSH("0",gr1);
+
 		ope = token;
 		token = scan_pp();
 		if((RType = term()) == ERROR) return(ERROR);
 		if(Type != Mode || Mode != RType) return(error_("operator error."));
 		POP(gr2);
-		POP(gr1);
+		//POP(gr1);
 		if(flag == -1) MULA(gr1, "-1");
 		if(ope == TPLUS) ADDA(gr1, gr2);
-		else if(ope == TMINUS) SUBA(gr1, gr2);
+		else if(ope == TMINUS) SUBA(gr2, gr1);
 		else if(ope == TOR) ADDL(gr1, gr2);
 		JOV("EOVF", NULL);
+		if(ope == TMINUS) LD(gr1,gr2);
 	}
-	if(ope!=0) PUSH("0", gr1);
+	//if(ope!=0) PUSH("0", gr1);
 	return(Type);
 }
 
@@ -672,6 +720,10 @@ int term(void){
 		token = scan_pp();
 		if((RType = factor()) == ERROR) return(ERROR);
 		if(Type != Mode || Mode != RType) return(error_("operator error."));
+
+		/*temp*/
+		LD_ra(gr1,"0",gr1);
+		PUSH("0",gr1);
 
 		POP(gr2);
 		POP(gr1);
@@ -766,8 +818,11 @@ int factor(void){	/* Irregular style*/
 
 int constant(void){
 	if(token == TNUMBER){
+		/*
 		if(num_attr == 0) LAD(gr1, "0", NULL);
 		else LAD(gr1, LATESTLABEL, NULL);
+		*/
+		LAD(gr1, string_attr, NULL);
 		token = scan_pp();
 		return(TPINT);
 	}
@@ -808,20 +863,21 @@ int relational_operator(void){
 
 int input_statement(void){
 	int Type, isln;
+	IN_INPUT++;
 	if(token == TREAD){token = scan_pp(); isln = 0;}
 	else if(token == TREADLN){token = scan_pp(); isln = 1;}
 	else return(error_("Keyword 'read' or 'readln' is not found"));
 	if(token == TLPAREN){
 		token = scan_pp();
 		if((Type = variable()) == ERROR) return(ERROR);
-		LD(gr1, LATESTLABEL);
+		//LD(gr1, LATESTLABEL);
 		if(Type == TPINT) CALL("READINT", NULL);
 		else if(Type == TPCHAR) CALL("READCHAR", NULL);
 		else return(error_("variable in input_statement must be integer or char"));
 		while(token == TCOMMA){
 			token = scan_pp();
 			if((Type = variable()) == ERROR) return(ERROR);
-			LD(gr1, LATESTLABEL);
+			//LD(gr1, LATESTLABEL);
 			if(Type == TPINT) CALL("READINT", NULL);
 			else if(Type == TPCHAR) CALL("READCHAR", NULL);
 			else return(error_("variable in input_statement must be integer or char"));
@@ -830,6 +886,7 @@ int input_statement(void){
 		token = scan_pp();
 	}
 	if(isln) CALL("HEADLINE",NULL);
+	IN_INPUT--;
 	return(NORMAL);
 }
 
@@ -865,8 +922,9 @@ int output_format(void){
 			token == TLPAREN || token == TNOT || token == TINTEGER || token == TBOOLEAN || token == TCHAR){
 		Type = expression();
 
-		if(token/* expression is only variable */) LD(gr1, LATESTLABEL);
-		else POP(gr1);
+
+		// if(token/* expression is only variable */) LD(gr1, LATESTLABEL); no need(written in expression)
+		// else POP(gr1); (need?)
 
 		if(Type != TPINT && Type != TPCHAR && Type != TPBOOL) return(error_("expression in output_format must be standerd_type."));
 		if(token == TCOLON){

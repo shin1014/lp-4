@@ -22,7 +22,7 @@ $wakakidasi
 	LAD	gr1,	L0003
 	LD	gr2,	gr0
 	CALL	WRITESTR
-	LD	gr1,	$sum
+	LAD	gr1,	$sum
 	LD	gr2,	gr0
 	CALL	WRITEINT
 	CALL	WRITELINE
@@ -44,45 +44,68 @@ $goukei
 	POP	gr2
 	ST	gr1,0,gr2
 L0004
+	LD	gr1,	$n%goukei
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
 	LAD	gr1,	0
 	POP	gr2
-	POP	gr1
-	CPA	gr1,gr2
-	JPL	L0005
-	ST	0,	gr1
-L0005
-	ST	1,	gr1
-	PUSH	0,gr1
-	LD	gr1,	$data%goukei
+	CPA	gr2,gr1
+	JPL	L0006
+	LD	gr1,	gr0
+	JUMP	L0007
+L0006
+	LAD	gr1,	1
+L0007
+	CPA	gr1,gr0
+	JZE	L0005
+	LAD	gr1,	$data%goukei
 	CALL	READINT
 	CALL	HEADLINE
 	LD	gr1,	$s%goukei
 	PUSH	0,gr1
+	LD	gr1,	$s%goukei
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
+	LAD	gr1,	$data%goukei
 	POP	gr2
-	POP	gr1
 	ADDA	gr1,gr2
 	JOV	EOVF
-	PUSH	0,gr1
 	POP	gr2
 	ST	gr1,0,gr2
 	LD	gr1,	$n%goukei
 	PUSH	0,gr1
-	LAD	gr1,	$n%goukei
-	POP	gr2
-	POP	gr1
-	SUBA	gr1,gr2
-	JOV	EOVF
+	LD	gr1,	$n%goukei
+	LD	gr1,	0,	gr1
 	PUSH	0,gr1
+	LAD	gr1,	1
+	POP	gr2
+	SUBA	gr2,gr1
+	JOV	EOVF
+	LD	gr1,	gr2
 	POP	gr2
 	ST	gr1,0,gr2
+	JUMP	L0004
+L0005
 	RET
 $n	DC	0
+L0001
 	LAD	gr1,	$n
+	PUSH	0,gr1
+	CALL	$kazuyomikomi
+	LAD	gr1,	$n
+	LAD	gr1,	2
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
 	POP	gr2
 	POP	gr1
 	MULA	gr1,gr2
 	JOV	EOVF
 	PUSH	0,gr1
+	PUSH	0,gr1
+	LAD	gr1,	$sum
+	PUSH	0,gr1
+	CALL	$goukei
+	CALL	$wakakidasi
 L0002	DC	'input the number of data'
 L0003	DC	'Sum of data = '
 EOVF
