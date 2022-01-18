@@ -584,7 +584,7 @@ int variable(void){
 
 int expression(void){
 	int Type;
-	int ope;
+	int ope=0;
 	char *truelabel, *falselabel;
 	if((Type = simple_expression()) == ERROR) return(ERROR);
 	while(token == TEQUAL || token == TNOTEQ || token == TLE || token == TLEEQ || token == TGR || token == TGREQ){
@@ -616,7 +616,7 @@ int expression(void){
 		print_label(truelabel);
 		ST("1", gr1, NULL); /* TRUE -> gr1 */
 	}
-	PUSH("0", gr1);
+	if(ope!=0) PUSH("0", gr1);
 	return(Type);
 }
 
@@ -625,7 +625,7 @@ int simple_expression(void){
 	int RType;
 	int Mode;	/* TPINT:int , TPBOOL:bool*/
 	int flag;
-	int ope;
+	int ope=0;
 	flag=0;
 
 	if(token == TPLUS){/* Constraint rule */
@@ -655,8 +655,8 @@ int simple_expression(void){
 		else if(ope == TMINUS) SUBA(gr1, gr2);
 		else if(ope == TOR) ADDL(gr1, gr2);
 		JOV("EOVF", NULL);
-		PUSH("0", gr1);
 	}
+	if(ope!=0) PUSH("0", gr1);
 	return(Type);
 }
 
@@ -756,7 +756,7 @@ int factor(void){	/* Irregular style*/
 			}else if(Type == TPCHAR){
 			}
 		}
-		PUSH("0", gr1);
+		if(Type==TPINT || Type==TPCHAR || Type==TPBOOL) PUSH("0", gr1);
 
 		token = scan_pp();
 		return(Type);

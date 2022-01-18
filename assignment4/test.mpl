@@ -22,7 +22,6 @@ $wakakidasi
 	LAD	gr1,	L0003
 	LD	gr2,	gr0
 	CALL	WRITESTR
-	PUSH	0,gr1
 	LD	gr1,	$sum
 	LD	gr2,	gr0
 	CALL	WRITEINT
@@ -42,7 +41,6 @@ $goukei
 	LD	gr1,	$s%goukei
 	PUSH	0,gr1
 	LAD	gr1,	0
-	PUSH	0,gr1
 	POP	gr2
 	ST	gr1,0,gr2
 L0004
@@ -65,7 +63,6 @@ L0005
 	ADDA	gr1,gr2
 	JOV	EOVF
 	PUSH	0,gr1
-	PUSH	0,gr1
 	POP	gr2
 	ST	gr1,0,gr2
 	LD	gr1,	$n%goukei
@@ -76,19 +73,15 @@ L0005
 	SUBA	gr1,gr2
 	JOV	EOVF
 	PUSH	0,gr1
-	PUSH	0,gr1
 	POP	gr2
 	ST	gr1,0,gr2
 	RET
 $n	DC	0
-	PUSH	0,gr1
 	LAD	gr1,	$n
 	POP	gr2
 	POP	gr1
 	MULA	gr1,gr2
 	JOV	EOVF
-	PUSH	0,gr1
-	PUSH	0,gr1
 	PUSH	0,gr1
 L0002	DC	'input the number of data'
 L0003	DC	'Sum of data = '
