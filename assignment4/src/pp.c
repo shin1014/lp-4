@@ -584,12 +584,39 @@ int variable(void){
 
 int expression(void){
 	int Type;
+	int ope;
+	char *truelabel, *falselabel;
 	if((Type = simple_expression()) == ERROR) return(ERROR);
 	while(token == TEQUAL || token == TNOTEQ || token == TLE || token == TLEEQ || token == TGR || token == TGREQ){
 		Type = relational_operator();
+		ope = token;
 		token = scan_pp();
 		if(simple_expression() == ERROR) return(ERROR);
+		POP(gr2);
+		POP(gr1);
+		CPA(gr1, gr2);
+		if(ope == TGR){ truelabel = newlabel(); JPL(truelabel, NULL); } /* > */
+		else if(ope == TLE){ truelabel = newlabel(); JMI(truelabel, NULL);} /* < */
+		else if(ope == TEQUAL){ truelabel = newlabel(); JZE(truelabel, NULL);} /* = */
+		else if(ope == TGREQ){ /* >= */
+			truelabel = newlabel();
+			falselabel = newlabel();
+			JMI(falselabel, NULL); /* if expression isn't true, goto false label. */
+			JZE(truelabel, NULL); /* if expression is true on equal, goto true label */
+			print_label(falselabel);
+		}else if(ope == TLEEQ){ /* <= */
+			truelabel = newlabel();
+			falselabel = newlabel();
+			JPL(falselabel, NULL); /* if expression isn't true, goto false label. */
+			JZE(truelabel, NULL); /* if expression is true on equal, goto true label */
+			print_label(falselabel);
+		}else error_(" undefined operator.");
+
+		ST("0", gr1, NULL); /* FALSE -> gr1 */
+		print_label(truelabel);
+		ST("1", gr1, NULL); /* TRUE -> gr1 */
 	}
+	PUSH("0", gr1);
 	return(Type);
 }
 
