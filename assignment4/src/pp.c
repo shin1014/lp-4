@@ -165,6 +165,7 @@ int parse_program(void){
 	token = scan_pp();
 	strcpy(PROCEDURE_NAME, " "); /* it means in global */
 	if(block() == ERROR) return (ERROR);
+	RET();
 	if(token != TDOT) return(error_("'.'is not found at the end of program"));
 	token = scan_pp();
 
@@ -599,9 +600,12 @@ int variable(void){
 		if(token != TRSQPAREN) return(error_("Symbol ']' is not found"));
 		token = scan_pp();
 		Type = ArrayType;
-	}else if(IN_LEFTPART || IN_EXPRESSION || IN_INPUT){
+	}else if(IN_INPUT){
 		if(search_idtab(name)->ispara) LD(gr1,LATESTLABEL);
 		else LAD(gr1,LATESTLABEL, NULL);
+	}else if(IN_LEFTPART || IN_EXPRESSION){
+		if(IN_CALL) LAD(gr1,LATESTLABEL, NULL);
+		else LD(gr1,LATESTLABEL);
 	}
 	return(Type);
 }
@@ -657,7 +661,7 @@ int expression(void){
 
 
 	}
-	if(IN_CALL) PUSH("0", gr1);
+
 	IN_EXPRESSION--;
 	return(Type);
 }
@@ -713,26 +717,38 @@ int term(void){
 	int Mode;
 	int RType;
 	int ope;
+	int pushed_flag=0;
 	if((Type = factor()) == ERROR) return(ERROR);
 	while(token == TSTAR || token == TDIV || token == TAND){
 		Mode = multiplicative_operator();
 		ope = token;
 		token = scan_pp();
-		if((RType = factor()) == ERROR) return(ERROR);
-		if(Type != Mode || Mode != RType) return(error_("operator error."));
 
 		/*temp*/
 		LD_ra(gr1,"0",gr1);
 		PUSH("0",gr1);
 
+		if((RType = factor()) == ERROR) return(ERROR);
+		if(Type != Mode || Mode != RType) return(error_("operator error."));
+
 		POP(gr2);
-		POP(gr1);
+		//POP(gr1);
 		if(ope == TSTAR) MULA(gr1, gr2);
 		else if(ope == TDIV) DIVA(gr1, gr2);
 		else if(ope == TAND) MULL(gr1, gr2);
 		JOV("EOVF", NULL);
-		PUSH("0", gr1);
+		new_DC();
+		strcpy(DC_tail->value, "0");
+		LAD(gr2, get_latestlabel(), NULL);
+		ST(gr1, "0", gr2);
+		if(IN_CALL){
+			PUSH("0", gr2);
+			pushed_flag = 1;
+		}
+		//PUSH("0", gr1);
+
 	}
+	if(IN_CALL && !pushed_flag) PUSH("0", gr1);
 	return(Type);
 }
 
@@ -885,7 +901,7 @@ int input_statement(void){
 		if(token != TRPAREN) return(error_("Symbol ')' is not found"));
 		token = scan_pp();
 	}
-	if(isln) CALL("HEADLINE",NULL);
+	if(isln) CALL("READLINE",NULL);
 	IN_INPUT--;
 	return(NORMAL);
 }
