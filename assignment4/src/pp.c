@@ -684,7 +684,7 @@ int simple_expression(void){
 	}
 
 	if((Type = term()) == ERROR) return(ERROR);
-	if(flag != 1 && Type != TPINT){/* Constraint rule */
+	if(flag !=0  && Type != TPINT){/* Constraint rule */
 		return(error_("the term after + or - must be integer."));
 	}
 	while(token == TPLUS || token == TMINUS || token == TOR){

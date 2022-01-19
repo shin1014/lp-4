@@ -1,115 +1,156 @@
-$$sample11pp	START
+$$typeconv	START
 	LAD	gr0,	0
 	CALL	L0001
 	CALL	FLUSH
 	SVC	0
-$n%kazuyomikomi	DC	0
-$kazuyomikomi
-	POP	gr2
-	POP	gr1
-	ST	gr1,	$n%kazuyomikomi
-	PUSH	0,gr2
-	LAD	gr1,	L0002
-	LD	gr2,	gr0
-	CALL	WRITESTR
-	CALL	WRITELINE
-	LD	gr1,	$n%kazuyomikomi
-	CALL	READINT
-	CALL	READLINE
-	RET
-$sum	DC	0
-$wakakidasi
-	LAD	gr1,	L0003
-	LD	gr2,	gr0
-	CALL	WRITESTR
-	LD	gr1,	$sum
-	LD	gr2,	gr0
-	CALL	WRITEINT
-	CALL	WRITELINE
-	RET
-$data	DC	0
-$n%goukei	DC	0
-$s%goukei	DC	0
-$data%goukei	DC	0
-$goukei
-	POP	gr2
-	POP	gr1
-	ST	gr1,	$s%goukei
-	POP	gr1
-	ST	gr1,	$n%goukei
-	PUSH	0,gr2
-	LD	gr1,	$s%goukei
+$i	DC	0
+$b	DC	0
+$c	DC	0
+L0001
+	LD	gr1,	$i
 	PUSH	0,gr1
-	LAD	gr1,	0
+	LD	gr1,	0
+	POP	gr1
+	CPA	gr1,gr0
+	JNZ	L0002
+(null)
+	ST	1,	gr1
+	PUSH	0,gr1
 	POP	gr2
 	ST	gr1,0,gr2
-L0004
-	LD	gr1,	$n%goukei
+L0003
+	LD	gr1,	$i
 	LD	gr1,	0,	gr1
 	PUSH	0,gr1
-	LAD	gr1,	0
+	LD	gr1,	1
+	POP	gr1
+	CPA	gr1,gr0
+	JNZ	L0005
+(null)
+	ST	1,	gr1
+	PUSH	0,gr1
 	POP	gr2
 	CPA	gr2,gr1
-	JPL	L0006
+	JPL	L0007
+	JZE	L0006
+L0007
 	LD	gr1,	gr0
 	JUMP	L0007
 L0006
 	LAD	gr1,	1
-L0007
 	CPA	gr1,gr0
-	JZE	L0005
-	LAD	gr1,	$data%goukei
-	CALL	READINT
-	CALL	READLINE
-	LD	gr1,	$s%goukei
+	JZE	L0004
+L0001
+	LD	gr1,	$i
+	POP	gr1
+	CPA	gr1,gr0
+	JNZ	L0008
+(null)
+	ST	1,	gr1
 	PUSH	0,gr1
-	LD	gr1,	$s%goukei
+	LD	gr2,	gr0
+	CALL	WRITEBOOL
+	LAD	gr1,	L0009
+	LD	gr2,	gr0
+	CALL	WRITESTR
+	LD	gr1,	$i
+	LD	gr2,	gr0
+	CALL	WRITEINT
+	CALL	WRITELINE
+	LD	gr1,	$i
+	PUSH	0,gr1
+	LD	gr1,	$i
 	LD	gr1,	0,	gr1
 	PUSH	0,gr1
-	LD	gr1,	$data%goukei
+	LAD	gr1,	1
 	POP	gr2
 	ADDA	gr1,gr2
 	JOV	EOVF
 	POP	gr2
 	ST	gr1,0,gr2
-	LD	gr1,	$n%goukei
+	JUMP	L0003
+L0004
+	CALL	WRITELINE
+	LD	gr1,	$i
 	PUSH	0,gr1
-	LD	gr1,	$n%goukei
+	POP	gr1
+	XOR	gr1,#FFFF
+	ADDA	gr1,1
+	PUSH	0,gr1
+	POP	gr2
+	ST	gr1,0,gr2
+L0011
+	LD	gr1,	$i
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
+	LAD	gr1,	127
+	POP	gr2
+	CPA	gr2,gr1
+	JMI	L0013
+	LD	gr1,	gr0
+	JUMP	L0014
+L0013
+	LAD	gr1,	1
+L0014
+	CPA	gr1,gr0
+	JZE	L0012
+L0001
+	LD	gr1,	$i
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
+	LAD	gr1,	16
+	POP	gr2
+	DIVA	gr1,gr2
+	JOV	EOVF
+	LAD	gr2,	L0015
+	ST	gr1,0,gr2
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
+	LAD	gr1,	16
+	POP	gr2
+	MULA	gr1,gr2
+	JOV	EOVF
+	LAD	gr2,	L0016
+	ST	gr1,0,gr2
+	LD	gr1,	0,	gr1
+	PUSH	0,gr1
+	LD	gr1,	$i
+	POP	gr2
+	CPA	gr2,gr1
+	JZE	L0017
+	LD	gr1,	gr0
+	JUMP	L0018
+L0017
+	LAD	gr1,	1
+L0018
+	CALL	WRITELINE
+	LD	gr1,	$i
+	POP	gr1
+	PUSH	0,gr1
+	LD	gr2,	gr0
+	CALL	WRITECHAR
+	LD	gr2,	gr0
+	CALL	WRITECHAR
+	LD	gr1,	$i
+	PUSH	0,gr1
+	LD	gr1,	$i
 	LD	gr1,	0,	gr1
 	PUSH	0,gr1
 	LAD	gr1,	1
 	POP	gr2
-	SUBA	gr2,gr1
+	ADDA	gr1,gr2
 	JOV	EOVF
-	LD	gr1,	gr2
 	POP	gr2
 	ST	gr1,0,gr2
-	JUMP	L0004
-L0005
+	JUMP	L0011
+L0012
+	CALL	WRITELINE
 	RET
-$n	DC	0
-L0001
-	LAD	gr1,	$n
-	PUSH	0,gr1
-	CALL	$kazuyomikomi
-	LAD	gr1,	$n
-	LD	gr1,	0,	gr1
-	PUSH	0,gr1
-	LAD	gr1,	2
-	POP	gr2
-	MULA	gr1,gr2
-	JOV	EOVF
-	LAD	gr2,	L0008
-	ST	gr1,0,gr2
-	PUSH	0,gr2
-	LAD	gr1,	$sum
-	PUSH	0,gr1
-	CALL	$goukei
-	CALL	$wakakidasi
-	RET
-L0002	DC	'input the number of data'
-L0003	DC	'Sum of data = '
-L0008	DC	0
+L0009	DC	' : '
+L0010	DC	' '
+L0015	DC	0
+L0016	DC	0
+L0019	DC	' '
 EOVF
 	CALL	WRITELINE
 	LAD	gr1,	EOVF1
