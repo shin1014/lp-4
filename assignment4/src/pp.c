@@ -481,10 +481,8 @@ int iteration_statement(void){
 	do_label = newlabel();
 	if((Type = expression()) == ERROR) return(ERROR);
 	if(Type != TPBOOL) return(error_("while statement must be boolean."));
-	//POP(gr1);
 	CPA(gr1,gr0);
 	JZE(do_label, NULL);
-	//JUMP("L[LOOPEND]", NULL);
 	if(token != TDO) return(error_("Keyword 'do' is not found"));
 	token = scan_pp();
 	if(statement() == ERROR) return(ERROR);
@@ -646,17 +644,17 @@ int expression(void){
 			print_label(falselabel);
 		}else error_(" undefined operator.");
 
-		LD(gr1,gr0); // ST("0", gr1, NULL); /* FALSE -> gr1 */
+		LD(gr1,gr0);  /* FALSE -> gr1 */
 		if(falselabel==NULL){
 			falselabel = newlabel();
 			JUMP(falselabel, NULL); /* temp, not correct */
 			print_label(truelabel);
-			LAD(gr1, "1", NULL); // ST("1", gr1, NULL); /* TRUE -> gr1 */
+			LAD(gr1, "1", NULL); /* TRUE -> gr1 */
 			print_label(falselabel);
 		}else{
 			JUMP(falselabel, NULL); /* temp, not correct */
 			print_label(truelabel);
-			LAD(gr1, "1", NULL); // ST("1", gr1, NULL); /* TRUE -> gr1 */
+			LAD(gr1, "1", NULL); /* TRUE -> gr1 */
 		}
 
 
@@ -700,7 +698,6 @@ int simple_expression(void){
 		if((RType = term()) == ERROR) return(ERROR);
 		if(Type != Mode || Mode != RType) return(error_("operator error."));
 		POP(gr2);
-		//POP(gr1);
 		if(flag == -1) MULA(gr1, "-1");
 		if(ope == TPLUS) ADDA(gr1, gr2);
 		else if(ope == TMINUS) SUBA(gr2, gr1);
@@ -708,7 +705,6 @@ int simple_expression(void){
 		JOV("EOVF", NULL);
 		if(ope == TMINUS) LD(gr1,gr2);
 	}
-	//if(ope!=0) PUSH("0", gr1);
 	return(Type);
 }
 
@@ -732,7 +728,6 @@ int term(void){
 		if(Type != Mode || Mode != RType) return(error_("operator error."));
 
 		POP(gr2);
-		//POP(gr1);
 		if(ope == TSTAR) MULA(gr1, gr2);
 		else if(ope == TDIV) DIVA(gr1, gr2);
 		else if(ope == TAND) MULL(gr1, gr2);
@@ -745,7 +740,6 @@ int term(void){
 			PUSH("0", gr2);
 			pushed_flag = 1;
 		}
-		//PUSH("0", gr1);
 
 	}
 	if(IN_CALL && !pushed_flag) PUSH("0", gr1);
@@ -886,14 +880,12 @@ int input_statement(void){
 	if(token == TLPAREN){
 		token = scan_pp();
 		if((Type = variable()) == ERROR) return(ERROR);
-		//LD(gr1, LATESTLABEL);
 		if(Type == TPINT) CALL("READINT", NULL);
 		else if(Type == TPCHAR) CALL("READCHAR", NULL);
 		else return(error_("variable in input_statement must be integer or char"));
 		while(token == TCOMMA){
 			token = scan_pp();
 			if((Type = variable()) == ERROR) return(ERROR);
-			//LD(gr1, LATESTLABEL);
 			if(Type == TPINT) CALL("READINT", NULL);
 			else if(Type == TPCHAR) CALL("READCHAR", NULL);
 			else return(error_("variable in input_statement must be integer or char"));
@@ -937,10 +929,6 @@ int output_format(void){
 			token == TNUMBER || token == TFALSE || token == TTRUE || (token == TSTRING && strlen(string_attr)==1) ||
 			token == TLPAREN || token == TNOT || token == TINTEGER || token == TBOOLEAN || token == TCHAR){
 		Type = expression();
-
-
-		// if(token/* expression is only variable */) LD(gr1, LATESTLABEL); no need(written in expression)
-		// else POP(gr1); (need?)
 
 		if(Type != TPINT && Type != TPCHAR && Type != TPBOOL) return(error_("expression in output_format must be standerd_type."));
 		if(token == TCOLON){

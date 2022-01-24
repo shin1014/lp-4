@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
 #define gr0 "gr0"
 #define gr1 "gr1"
 #define gr2 "gr2"
@@ -19,7 +24,7 @@ struct DC {
 	struct DC *nextp;
 };
 
-void init_output(void);
+void init_output(char* program_name);
 void init_DC_list(void);
 void end_output(void);
 void start_mpl(char* program_name);

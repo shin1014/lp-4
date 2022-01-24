@@ -1,9 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "mpplc.h"
 #include "token-list.h"
+#include "mpplc.h"
 
 #define LABELSIZE 6
 
@@ -13,8 +9,10 @@ struct DC DC_root;
 struct DC *DC_tail;
 struct DC *DC_pretail;
 
-void init_output(void){
-	if ((outfp = fopen("test.mpl", "w")) == NULL) {/* open file "test.mpl" for write. */
+void init_output(char* program_name){
+	char file_name[MAXSTRSIZE];
+	sprintf(file_name, "%s.mpl", program_name+2);
+	if ((outfp = fopen(file_name, "w")) == NULL) {/* open file "test.mpl" for write. */
 		printf("cannot open\n");	/* if can't open file */
 		exit(1);      	/* exit */
 	}

@@ -67,7 +67,7 @@ int main(int nc, char *np[]) {
     init_globalid();
     init_localid();
 
-    init_output();
+    init_output(np[0]);
     init_DC_list();
 
     token = scan();
