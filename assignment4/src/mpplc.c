@@ -18,6 +18,7 @@ void init_output(char* program_name){
 	}
 }
 
+
 void init_DC_list(void){
 	DC_tail = &DC_root;
 	DC_pretail = NULL;
