@@ -53,6 +53,7 @@ extern char string_attr[MAXSTRSIZE];
 int token;
 int error_(char *mes);
 
+
 FILE *outfp;
 
 int main(int nc, char *np[]) {
@@ -60,15 +61,15 @@ int main(int nc, char *np[]) {
 	printf("File name id not given.\n");
 	return 0;
     }
-    if(init_scan(np[1]) < 0) {
+   if(init_scan(np[1]) < 0) {
 	printf("File %s can not open.\n", np[1]);
 	return 0;
     }
     init_globalid();
     init_localid();
 
-    init_output(np[0]);
     init_DC_list();
+    init_output(np[1]);
 
     token = scan();
     parse_program();

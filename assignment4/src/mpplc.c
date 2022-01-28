@@ -10,9 +10,12 @@ struct DC *DC_tail;
 struct DC *DC_pretail;
 
 void init_output(char* program_name){
-	char file_name[MAXSTRSIZE];
-	sprintf(file_name, "%s.mpl", program_name+2);
-	if ((outfp = fopen(file_name, "w")) == NULL) {/* open file "test.mpl" for write. */
+	int size = strlen(program_name);
+	program_name[size-3] = 'c';
+	program_name[size-2] = 's';
+	program_name[size-1] = 'l';
+	printf("%s\n", program_name);
+	if ((outfp = fopen(program_name, "w")) == NULL) {/* open file for write. */
 		printf("cannot open\n");	/* if can't open file */
 		exit(1);      	/* exit */
 	}
