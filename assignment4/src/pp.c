@@ -248,15 +248,15 @@ int variable_name(void){
 	}
 
 	char label[MAXSTRSIZE];
-	if(!SUBPRO_DEC) snprintf(label,MAXSTRSIZE,"$%s",string_attr); /* global */
-	else snprintf(label,MAXSTRSIZE,"$%s%%%s",string_attr, PROCEDURE_NAME); /* local */
+	if(!SUBPRO_DEC) sprintf(label,"$%s",string_attr); /* global */
+	else sprintf(label,"$%s%%%s",string_attr, PROCEDURE_NAME); /* local */
 	struct ID *id;
 	if(IN_FP || IN_VAR){ /*declear part*/
 		DC(label, "0");
 	}else{ /*refer part*/
 		id = search_idtab(string_attr);
-		if(!strcmp(id->procname, " ")) snprintf(label,MAXSTRSIZE,"$%s",id->name); /* global */
-		else snprintf(label,MAXSTRSIZE,"$%s%%%s",id->name, id->procname); /* local */
+		if(!strcmp(id->procname, " ")) sprintf(label,"$%s",id->name); /* global */
+		else sprintf(label,"$%s%%%s",id->name, id->procname); /* local */
 		strcpy(LATESTLABEL, label);
 	}
 	token = scan_pp();
